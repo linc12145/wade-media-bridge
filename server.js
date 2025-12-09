@@ -31,13 +31,15 @@ wss.on('connection', (ws, req) => {
 	'chunk:',
 	msg.media && msg.media.chunk
 	);
-    } else if (msg.event === 'stop'){
-	console.log('stream stopped:', msg.stop);
+        } else if (msg.event === 'stop') {
+      console.log('stream stopped:', msg.stop);
     } else {
-	console.log('Other event:', msg.event);
-    } catch (err) {
-      console.error('Error parsing Twilio WS message:', err);
+      console.log('Other event:', msg.event);
     }
+  } catch (err) {
+    console.error('Error parsing Twilio WS message:', err);
+  }
+
   });
 
   ws.on('close', () => {
