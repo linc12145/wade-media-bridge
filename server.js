@@ -17,27 +17,31 @@ const server = http.createServer(app);
 const wss = new WebSocket.Server({ server, path: '/twilio' });
 
 wss.on('connection', (ws, req) => {
-  console.log('🔌 Twilio Media Stream connected');
+  console.log('Twilio Media Stream connected');
 
   ws.on('message', (data) => {
     try {
       const msg = JSON.parse(data.toString());
       if (msg.event === 'start') {
-        console.log('➡️  Stream started:', msg.start);
-      } else if (msg.event === 'media') {
-        console.log('🎧 media frame seq:', msg.media.sequenceNumber);
-      } else if (msg.event === 'stop') {
-        console.log('⏹ stream stopped:', msg.stop);
-      } else {
-        console.log('Other event:', msg.event);
-      }
+        console.log('Stream started:', msg.start);
+     } else if (msg.event === 'media') {
+       console.log(
+	'media frame seq:',
+	msg.sequenceNumber, 
+	'chunk:',
+	msg.media && msg.media.chunk
+	);
+    } else if (msg.event === 'stop'){
+	console.log('stream stopped:', msg.stop);
+    } else {
+	console.log('Other event:', msg.event);
     } catch (err) {
       console.error('Error parsing Twilio WS message:', err);
     }
   });
 
   ws.on('close', () => {
-    console.log('🔌 Twilio Media Stream disconnected');
+    console.log('Twilio Media Stream disconnected');
   });
 
   ws.on('error', (err) => {
@@ -47,5 +51,5 @@ wss.on('connection', (ws, req) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`🚀 Wade media bridge listening on port ${PORT}`);
+  console.log(`Wade media bridge listening on port ${PORT}`);
 });
