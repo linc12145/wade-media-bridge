@@ -19,27 +19,32 @@ const wss = new WebSocket.Server({ server, path: '/twilio' });
 wss.on('connection', (ws, req) => {
   console.log('Twilio Media Stream connected');
 
-  ws.on('message', (data) => {
+  ws.on('message', (msg) => {
     try {
-      const msg = JSON.parse(data.toString());
-      if (msg.event === 'start') {
-        console.log('Stream started:', msg.start);
-     } else if (msg.event === 'media') {
-       console.log(
-	'media frame seq:',
-	msg.sequenceNumber, 
-	'chunk:',
-	msg.media && msg.media.chunk
-	);
-        } else if (msg.event === 'stop') {
-      console.log('stream stopped:', msg.stop);
-    } else {
-      console.log('Other event:', msg.event);
-    }
-  } catch (err) {
-    console.error('Error parsing Twilio WS message:', err);
-  }
+      const data = JSON.parse(msg);
 
+      if (data.event === 'start') {
+        console.log('--- Twilio stream STARTED ---');
+        console.log('streamSid:', data.start.streamSid);
+        console.log('callSid:', data.start.callSid);
+
+        // Custom parameters from Twilio Function
+        if (data.start.customParameters) {
+          console.log('customParameters:', data.start.customParameters);
+        } else {
+          console.log('No customParameters present');
+        }
+
+      } else if (data.event === 'media') {
+        // Optional: throttle or comment this out if too noisy
+        // console.log('media frame', data.media.sequenceNumber);
+      } else if (data.event === 'stop') {
+        console.log('--- Twilio stream STOPPED ---');
+        console.log('reason:', data.stop && data.stop.reason);
+      }
+    } catch (err) {
+      console.error('Error parsing Twilio message:', err);
+    }
   });
 
   ws.on('close', () => {
